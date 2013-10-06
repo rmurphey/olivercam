@@ -3,7 +3,7 @@ html(lang="en")
 head
   title= pageTitle
   script(src="/socket.io/socket.io.js")
-  script(src="/public/js/app.js")
+  script(src="/public/js/app.js", data-hostname=hostname)
 body
   ul(id="pictures")
     each pic in pictures

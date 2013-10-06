@@ -1,13 +1,20 @@
 (function () {
 
-var picturesEl = document.getElementById('pictures');
+var picturesEl;
+var scripts = document.getElementsByTagName('script');
+var thisScript = scripts[scripts.length - 1];
+var hostname = thisScript.getAttribute('data-hostname');
 
-var socket = io.connect('http://10.0.1.9');
+var socket = io.connect('http://' + hostname);
 
 socket.on('pictures', function (data) {
-  console.log('got data', data);
+  picturesEl = picturesEl || document.getElementById('pictures');
 
   var frag = document.createDocumentFragment();
+  var li = document.createElement('li');
+
+  li.innerHTML = 'Auto-updated at ' + new Date().toString();
+  frag.appendChild(li);
 
   data.pictures.forEach(function (pic) {
     var li = document.createElement('li');
