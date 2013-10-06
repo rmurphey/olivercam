@@ -7,8 +7,6 @@ var limit = 5;
 var interval = 1 * 60 * 1000; // 1 minute
 var imagesDir = __dirname + '/public/img/';
 
-console.log(imagesDir);
-
 fs.readdir(imagesDir, function (err, files) {
   if (err) {
     console.error('error reading old images', err);
