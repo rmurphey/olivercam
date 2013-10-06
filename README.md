@@ -14,4 +14,4 @@ If you want to use this, you're on your own, but:
 
 # License
 
-[WTFPL](http://www.wtfpl.net/about/)
+MIT.
