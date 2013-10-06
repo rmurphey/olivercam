@@ -1,7 +1,10 @@
 var express = require('express');
 var app = express();
+var server = require('http').createServer(app);
+var io = require('socket.io').listen(server);
 var fs = require('fs-extra');
 var pics = [];
+var sockets = [];
 
 var limit = 5;
 var interval = 1 * 60 * 1000; // 1 minute
@@ -61,6 +64,7 @@ function takePicture () {
     }
 
     pics.push({ src : '/public' + filename });
+    io.sockets.emit('pictures', { pictures : pics });
     cleanup();
   });
 }
