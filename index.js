@@ -4,30 +4,24 @@ var fs = require('fs-extra');
 var pics = [];
 
 var limit = 5;
-var interval = 1 * 10 * 1000; // 1 minute
+var interval = 1 * 60 * 1000; // 1 minute
 var imagesDir = __dirname + '/public/img/';
 
 console.log(imagesDir);
 
 fs.readdir(imagesDir, function (err, files) {
-  console.log('got here');
-
   if (err) {
-    console.log('error reading old images', err);
+    console.error('error reading old images', err);
     return;
   }
 
-  console.log(files);
-
   files.forEach(function (file) {
     if (file.match(/\.jpg$/)) {
-      pics.unshift({
+      pics.push({
         src : '/public/img/' + file
       });
     }
   });
-
-  console.log(pics);
 });
 
 app.use(express.logger());
@@ -46,11 +40,10 @@ function cleanup () {
   if (pics.length > limit) {
     fs.remove(pics.shift(), function (err) {
       if (err) {
-        console.log('error removing file', oldest, err);
+        console.error('error removing file', oldest, err);
         return;
       }
 
-      console.log('cleanup complete');
       setTimeout(takePicture, interval);
     });
   } else {
@@ -63,15 +56,11 @@ function takePicture () {
   var filename = '/img/olivercam-' + new Date().getTime() + '.jpg';
   var fullFilename = __dirname + '/public' + filename
 
-  console.log('taking a picture', filename);
-
-  exec('fswebcam -r 640*480 -d /dev/video0 ' + fullFilename, function (err, stdout, stderr) {
+  exec('fswebcam -r 640x480 -d /dev/video0 ' + fullFilename, function (err, stdout, stderr) {
     if (err) {
-      console.log('error taking picture', err);
+      console.error('error taking picture', err);
       return;
     }
-
-    console.log('took a picture');
 
     pics.push({ src : '/public' + filename });
     cleanup();
