@@ -3,13 +3,18 @@ var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
 var fs = require('fs-extra');
+
 var pics = [];
 
-var limit = 5;
-var interval = 1 * 20 * 1000; // 20 seconds
-var imagesDir = __dirname + '/public/img/';
+var settings = {
+  limit : 5,
+  interval : 1 * 20 * 1000,
+  appName : 'OliverCam',
+  hostname : '10.0.1.9',
+  port : 3000
+};
 
-fs.readdir(imagesDir, function (err, files) {
+fs.readdir(__dirname + '/public/img/', function (err, files) {
   if (err) {
     console.error('error reading old images', err);
     return;
@@ -29,16 +34,16 @@ app.use('/public', express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
   res.render('index.jade', {
-    pageTitle : 'Olivercam',
+    pageTitle : settings.appName,
     pictures : [].concat(pics).reverse(),
-    hostname : '10.0.1.9'
+    hostname : settings.hostname
   });
 });
 
 app.engine('jade', require('jade').__express);
 
 function cleanup () {
-  if (pics.length > limit) {
+  if (pics.length > settings.limit) {
     var picsToRemove = pics.slice(0, limit * -1 + 1);
     var startIndex = 0;
 
@@ -56,7 +61,7 @@ function cleanup () {
   }
 }
 
-function takePicture (waitForNextPicture) {
+function takePicture () {
   var exec = require('child_process').exec;
   var filename = '/img/olivercam-' + new Date().getTime() + '.jpg';
   var fullFilename = __dirname + '/public' + filename
@@ -71,13 +76,11 @@ function takePicture (waitForNextPicture) {
     io.sockets.emit('pictures', { pictures : [].concat(pics).reverse() });
     cleanup();
 
-    if (!waitForNextPicture) {
-      setTimeout(takePicture, interval);
-    }
+    setTimeout(takePicture, settings.interval);
   });
 }
 
-server.listen(3000);
+server.listen(settings.port);
 takePicture();
 
 console.log('app started on localhost:3000');
